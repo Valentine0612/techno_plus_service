@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<h2 class="text-center">Создание Технологической карты</h2>
+<br>
+<div class="row">
+    <div class="col-md-1"></div>
+    <div class="col-md-10">
+        <form method="post" autocomplete="off">
+            {% csrf_token %}
+            {% for field in form %}
+            {{ field|as_crispy_field }}
+            {% endfor %}
+            <button type="submit" class="btn btn-primary">Создать</button>
+        </form>
+    </div>
+    <div class="col-md-1"></div>
+</div>
+
+{% endblock %}
+
+{% block extrascripts %}
+<script>
+    $("#id_tk_field").change(function () {
+        const Tk_Book = $(this).val();
+
+        $.ajax({
+            url: '/ajax/load-tk-book/',
+            data: {
+                'book': Tk_Book
+            },
+            success: function (data) {
+                $("#id_collections").html(data);
+            }
+        });
+    });
+
+    $("#id_collections").change(function () {
+        const Tk_collections = $(this).val();
+        const Tk_Book = $("#id_tk_field").val();
+
+        $.ajax({
+            url: '/ajax/load-tk-departament/',
+            data: {
+                'book': Tk_Book,
+                'collections': Tk_collections
+            },
+            success: function (data) {
+                $("#id_departament").html(data);
+            }
+        });
+    });
+
+    $("#id_departament").change(function () {
+        const Tk_departament = $(this).val();
+        const Tk_Book = $("#id_tk_field").val();
+
+        $.ajax({
+            url: '/ajax/load-tk-sections/',
+            data: {
+                'book': Tk_Book,
+                'departament': Tk_departament
+            },
+            success: function (data) {
+                $("#id_section").html(data);
+            }
+        });
+    });
+
+    $("#id_section").change(function () {
+        const Tk_section = $(this).val();
+        const Tk_Book = $("#id_tk_field").val();
+        $.ajax({
+            url: '/ajax/load-tk-subsections/',
+            data: {
+                'book': Tk_Book,
+                'section': Tk_section
+            },
+            success: function (data) {
+                $("#id_subsection").html(data);
+            }
+        });
+    });
+
+    $("#id_subsection").change(function () {
+        const Tk_subsection = $(this).val();
+        const Tk_Book = $("#id_tk_field").val();
+        if (Tk_Book === 'TkMainCollection' || Tk_Book === 'TkPre_commissioningCollection') {
+            $.ajax({
+                url: '/ajax/load-tk-table-subsections/',
+                data: {
+                    'book': Tk_Book,
+                    'subsection': Tk_subsection
+                },
+                success: function (data) {
+                    $("#id_tablesubsection").html(data);
+                }
+            });
+        } else {
+            $.ajax({
+                url: '/ajax/load_tk_techkart/',
+                data: {
+                    'book': Tk_Book,
+                    'param': Tk_subsection
+                },
+                success: function (data) {
+                    $("#id_techkart").html(data);
+                }
+            });
+        }
+    });
+
+    $("#id_tablesubsection").change(function () {
+        const Tk_tablesubsection = $(this).val();
+        const Tk_Book = $("#id_tk_field").val();
+        if (Tk_Book === 'TkMainCollection' || Tk_Book === 'TkPre_commissioningCollection') {
+            $.ajax({
+                url: '/ajax/load_tk_techkart/',
+                data: {
+                    'book': Tk_Book,
+                    'param': Tk_tablesubsection
+                },
+                success: function (data) {
+                    $("#id_techkart").html(data);
+                }
+            });
+        };
+    });
+    $("#id_techkart").change(function(){
+        const tk = $("#id_techkart option:selected").attr('card')
+        const code = $("#id_techkart option:selected").attr('code')
+        $("#id_title").val(tk);
+        $("#id_code").val(code);
+    });
+
+</script>
+{% endblock %}

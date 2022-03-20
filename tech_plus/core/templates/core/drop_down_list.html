@@ -1,0 +1,6 @@
+<option value="">--- Выберите значение ---</option>
+{% for material in materials %}
+<option title="{{material}}" code="{% if material.title %} {{material.title}} {% endif %}"
+card="{% if material.description %} {{material.description}} {% endif %}" 
+value="{{ material.pk }}"> {{ material }}</option>
+{% endfor %}

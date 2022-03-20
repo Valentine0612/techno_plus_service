@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+
+{% load my_filter %}
+
+{% block content %}
+<div class="text-center">
+    <div class="btn-group" role="group">
+        <div class="dropdown">
+            <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Форма-7
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                {% for form in forms %}
+                <a class="dropdown-item" href="{{ form.get_absolute_url }}"> Форма-7({{forloop.counter}})</a>
+                {% endfor %}
+            </div>
+          </div>
+        <a class="btn btn-sm btn-outline-primary" href="{{ object.form_8.get_form_8_url }}">Форма-8</a>
+        <a class="btn btn-sm btn-outline-primary" href="{{ object.form_8.get_form_1_url }}">Форма-1</a>
+        <a class="btn btn-sm btn-outline-primary" href="{{ object.form_8.get_form_2_url }}">Форма-2</a>
+        <a class="btn btn-sm btn-outline-primary" href="{{ object.form_8.get_form_3_url }}">Форма-3</a>
+        <a class="btn btn-sm btn-outline-primary" href="{{ object.form_8.get_form_4_url }}">Форма-4</a>
+        <a class="btn btn-sm btn-outline-primary" href="{{ object.form_8.get_form_5_url }}">Форма-5</a>
+        <a class="btn btn-sm btn-outline-primary" href="{{ object.form_8.get_form_6_url }}">Форма-6</a>
+    </div>
+</div>
+<hr>
+<h4 class="text-center">
+    "Фотоучет смешанный"
+</h4>
+<p class="text-center mt-4">
+    {{object.form_8.title}} <br> к {{object.form_8.code}}
+</p>
+
+<br>
+<table class="table table-secondary table-sm table-bordered">
+    <thead>
+        <tr>
+            <th class="align-text-top" rowspan="2"  scope="col">Отдел</th>
+            <th class="text"  scope="col">Строительная организация</th>
+            <th class="align-text-bottom text-center"  rowspan="2" scope="col">{{object.created_at|date:"Y"}}</th>
+            <th class="text-center" scope="col">Начало</th>
+            <th class="text-center" scope="col">Конец</th>
+            <th class="text-center" scope="col">Продолж.</th>
+            <th class="text-center" scope="col">№ набл.</th>
+            <th class="align-text-bottom text-center" rowspan="3" scope="col">ФС</th>
+        </tr>
+        <tr>
+            <th class="text"  scope="col">Объект</th>
+            <th class="text-center" scope="col">{{object.start|date:"H"}} ч. {{object.start|date:"i"}} м.</th>
+            <th class="text-center" scope="col">{{object.end|date:"H"}} ч. {{object.end|date:"i"}} м.</th>
+            <th class="text-center" scope="col">{{object.get_time_diff}}</th>
+            <th class="text-center" scope="col"></th>
+        </tr>
+        <tr>
+            <th class="text" colspan="2" scope="col">Наименование процесса</th>
+            <th class="text" colspan="5" scope="col">{{object.form_8.title}}</th>
+        </tr>
+    </thead>
+    <thead>
+        <tr>
+            <th class="text" rowspan="2" scope="col">№</th>
+            <th class="text" colspan="4" rowspan="2" scope="col">Наименование <br> элементов</th>
+            <th class="text-center" rowspan="2"  scope="col"> Сумма затрат <br> труда в чел. - <br>  минут</th>
+            <th class="text-center" rowspan="2"  scope="col"> Количество продукции <br> и измерительных <br>  элементов</th>
+            <th class="text-center" rowspan="2"  scope="col"> Примечание</th>
+        </tr>
+    
+    </thead>
+
+    <tbody>
+        {% for operation in object.has_operations.all %}
+        <tr>
+            <td>{{forloop.counter}}</td>
+            <td colspan="4">{{operation.name}}</td>
+            
+            <td>
+                {{operation.duration}}
+            </td>
+            <td>
+                {{operation.products}} {{operation.measure.code}}
+            </td>
+            <td style="white-space: nowrap;">
+                    {% for workman in operation.member_operation.all %}
+                        <p>
+                            {{workman.workman.name}} - {{workman.count}}
+                        </p>
+                    {% endfor %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<a class="btn btn-sm btn-outline-danger" href="{{ object.form_8.get_absolute_url }}">На главную страницу ТК</a>
+{% if not object.form_8.verified %}
+<a class="btn btn-sm btn-info" href="{{ object.get_edit_url }}">Редактировать форму</a>
+{% endif %}
+<a class="get-excel" href="{% url 'form_7_excel' form_7.pk%}"><button type="button" class="btn btn-sm btn-primary">Скачать excel</button></a>
+{% endblock %}

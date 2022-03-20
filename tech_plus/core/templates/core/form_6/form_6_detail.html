@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% load my_filter %}
+
+{% block content %}
+<div class="text-center">
+    <div class="btn-group" role="group">
+        <div class="dropdown">
+            <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Форма-7
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                {% for form in object.form_8.all %}
+                <a class="dropdown-item" href="{{ form.get_absolute_url }}"> Форма-7({{forloop.counter}})</a>
+                {% endfor %}
+            </div>
+          </div>
+        <a class="btn btn-sm btn-outline-primary" href="{{ object.get_form_8_url }}">Форма-8</a>
+        <a class="btn btn-sm btn-outline-primary" href="{{ object.get_form_1_url }}">Форма-1</a>
+        <a class="btn btn-sm btn-outline-primary" href="{{ object.get_form_2_url }}">Форма-2</a>
+        <a class="btn btn-sm btn-outline-primary" href="{{ object.get_form_3_url }}">Форма-3</a>
+        <a class="btn btn-sm btn-outline-primary" href="{{ object.get_form_4_url }}">Форма-4</a>
+        <a class="btn btn-sm btn-outline-primary" href="{{ object.get_form_5_url }}">Форма-5</a>
+        <a class="btn btn-sm btn-primary" href="{{ object.get_form_6_url }}">Форма-6</a>
+    </div>
+</div>
+<hr>
+<h4 class="text-center mt-3">
+    "Таблица ЭСН (ЭСНм, ЭСНр, ЭСНп)"
+</h4>
+<p class="text-center mt-4">
+    {{object.title}} <br> к {{object.code}}
+</p>
+<br>
+<h5> Наименование работ</h5>
+{% for operation in operations %}
+<p>{{forloop.counter}} - {{operation}}</p>
+{% endfor %}
+<hr>
+<h5>
+    Измеритель ЭСН/ЭСНм/ЭСНп: {{object.main_measure}}
+</h5>
+<table class="table table-secondary table-sm table-bordered">
+    <thead>
+        <tr>
+            <th class="text-center" scope="col">№</th>
+            <th class="text-center" scope="col">Наименование элемента затрат</th>
+            <th class="text-center" scope="col">Ед. изм.</th>
+            <th class="text-center" style="white-space: nowrap;" scope="col">{{object.code}}</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td class="text-center">
+                1
+            </td>
+            <td> <strong>Затраты труда рабочих-строителей</strong></td>
+            <td>чел.-ч.</td>
+            <td class="text-center">{{k_sum_measure_workmans}}</td>
+        </tr>
+        <tr>
+            <td class="text-center">1.1</td>
+            <td>Средний разряд работы</td>
+            <td></td>
+            <td class="text-center">{{average_rank}}</td>
+        </tr>
+        <tr>
+            <td class="text-center">2</td>
+            <td> <strong>Затраты труда машинистов</strong></td>
+            <td>чел.-ч.</td>
+            <td class="text-center">{{sum_of_driver}}</td>
+        </tr>
+        <tr>
+            <td class="text-center">3</td>
+            <td><strong>Машины и механизмы</strong></td>
+            <td>маш.-ч.</td>
+            <td></td>
+        </tr>
+        {% for key, value in measure_machines.items %}
+        <tr>
+            <td></td>
+            <td>{{key}}</td>
+            <td>{{key.measurement}}</td>
+            <td class="text-center">{{value}}</td>
+        </tr>
+        {% endfor %}
+        <tr>
+            <td class="text-center">4</td>
+            <td><strong>Материалы</strong></td>
+            <td></td>
+            <td></td>
+        </tr>
+        {% for key, value in material_measure.items %}
+        <tr>
+            <td></td>
+            <td>{{key}}</td>
+            <td>{{key.measurement}}</td>
+            <td class="text-center">{{value}}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<a class="btn btn-sm btn-outline-danger" href="{{ object.get_absolute_url }}">На главную страницу ТК</a>
+<a class="get-excel" href="{% url 'form_6_excel' form_8.pk%}"><button type="button" class="btn btn-sm btn-primary">Скачать excel</button></a>
+{% endblock %}

@@ -1,0 +1,7 @@
+tech_plus/db.sqlite3
+__pycache__
+migrations
+venv
+.vscode/
+.lock.*
+*.xlsx

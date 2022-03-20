@@ -1,0 +1,278 @@
+{% extends 'base.html' %}
+{% load my_filter %}
+{% block content %}
+
+
+{%if not object.form_8.all %}
+{%else%}
+<div class="text-center">
+    <div class="btn-group" role="group">
+        <div class="dropdown">
+            <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" id="dropdownMenuButton"
+                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Форма-7
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                {% for form in object.form_8.all %}
+                <a class="dropdown-item" href="{{ form.get_absolute_url }}"> Форма-7({{forloop.counter}})</a>
+                {% endfor %}
+            </div>
+        </div>
+        <a class="btn btn-sm btn-outline-primary" href="{{ object.get_form_8_url }}">Форма-8</a>
+        <a class="btn btn-sm btn-outline-primary" href="{{ object.get_form_1_url }}">Форма-1</a>
+        <a class="btn btn-sm btn-outline-primary" href="{{ object.get_form_2_url }}">Форма-2</a>
+        <a class="btn btn-sm btn-outline-primary" href="{{ object.get_form_3_url }}">Форма-3</a>
+        <a class="btn btn-sm btn-outline-primary" href="{{ object.get_form_4_url }}">Форма-4</a>
+        <a class="btn btn-sm btn-outline-primary" href="{{ object.get_form_5_url }}">Форма-5</a>
+        <a class="btn btn-sm btn-outline-primary" href="{{ object.get_form_6_url }}">Форма-6</a>
+    </div>
+</div>
+<hr>
+{%endif%}
+<h4 class="text-center mt-4">
+    Технологическая карта {% if object.verified %}
+    <span title="Верифицировано" class="fa fa-check-circle-o " style="color: green;"></span>
+    {% endif %}
+</h4>
+<h5 class="text-center mt-4">
+    {{object.title}}
+</h5>
+<br>
+<div class="container">
+    <div class="row">
+        <div class="col-md-1"></div>
+        <div class="col-md-10">
+            <table class="table table-secondary table-sm table-bordered">
+                <thead>
+                    <tr>
+                        <th class="text-center" colspan="2" scope="col">Атрибуты ТК</th>
+                    </tr>
+                    <tr>
+                        <th class="text-center" scope="col">Параметр</th>
+                        <th class="text-center" scope="col">Значение</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Создал</td>
+                        <td>{{object.creator.get_full_name}}</td>
+                    </tr>
+                    <tr>
+                        <td>Проверил</td>
+                        <td>{% if object.verifier %}
+                            {{object.verifier.get_full_name}}
+                        {%else%}
+                        ---
+                        {% endif %}
+                    </td>
+                    </tr>
+                    <tr>
+                        <td>Шифр ТК</td>
+                        <td>{{object.code}}</td>
+                    </tr>
+                    <tr>
+                        <td>Измеритель процесса</td>
+                        <td>{{object.process_meter}} {{object.process_measure}}</td>
+                    </tr>
+                    <tr>
+                        <td>Измеритель ЭСН/ЭСНм/ЭСНп</td>
+                        <td>{{object.main_measure}}</td>
+                    </tr>
+                    <tr>
+                        <td>Коэффициент рабочего звена</td>
+                        <td>{{object.workman_k}}</td>
+                    </tr>
+
+                </tbody>
+            </table>
+            <form action="{{ object.get_verifier_url }}" method="POST">
+            <button type="button" class="delete-tk btn btn-sm btn-outline-danger"
+                data-form-url="{{ object.get_delete_url }}" title="Удаление">
+                Удалить ТК
+            </button>
+            {% if not object.verified %}
+            <a class="btn btn-sm btn-info" href="{{ object.get_update_url }}">Редактировать атрибуты ТК</a>
+            {% endif %}
+            {% if not object.verified and user.is_verifier %}
+                {%csrf_token%}
+                <button type="submit" class="btn btn-sm btn-success" title="Верифицировать">
+                    Верифицировать ТК
+                </button>
+            </form>
+            {% endif %}
+        </div>
+        <div class="col-md-1"></div>
+    </div>
+</div>
+<br>
+{% if operations %}
+<hr>
+<h4 class="text-center mt-4">Пользовательская форма к {{object.code}} </h4>
+<p class="text-center">{{object.title}}</p>
+<h5>Измеритель: {{object.process_meter}} {{object.process_measure}}</h5>
+<table class="table table-secondary table-sm table-bordered">
+    <thead>
+        <tr>
+            <th class="text-center" rowspan="2" scope="col">№</th>
+            <th class="text-center" rowspan="2" scope="col">Обоснование</th>
+            <th class="text-center" rowspan="2" scope="col">Наименоване <br> работ и затрат</th>
+            <th class="text-center" rowspan="2" scope="col">Кол-во рабочих-строителей <br> чел.</th>
+            <th class="text-center" rowspan="2" scope="col">Ед. изм.</th>
+            <th class="text-center" rowspan="2" scope="col">Формула подстчета <br> объема</th>
+            <th class="text-center" rowspan="2" scope="col">Объем <br> рабочих  <br> операций </th>
+            <th class="text-center" colspan="2" scope="col">Потребность в ресурсах</th>
+        </tr>
+        <tr>
+            <th class="text-center" scope="col">На ед. изм.</th>
+            <th class="text-center" scope="col">Общая</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for operation in operations %}
+        <tr>
+            <td>
+                {{forloop.counter}}
+            </td>
+            <td>{% if operation.code %}
+                {{operation.code}}
+            {%else%}
+                ТВН №{{forloop.counter}}
+            {% endif %}
+            </td>
+            <td>
+                {{operation}}
+            </td>
+            <td></td>
+            <td>{{operation.measure}}</td>
+            <td style="white-space: nowrap;">
+                {{ products|lookup:operation.name }}
+            </td>
+            <td>
+                {{ sum_products|lookup:operation.name }}
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
+
+
+        {% if operation.member_operation.all %}
+        <tr>
+            <td></td>
+            <td></td>
+            <td>
+                <strong>Состав звена:</strong>
+            </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        {% for workman in operation.member_operation.all %}
+        <tr>
+            <td></td>
+            <td></td>
+            <td>
+                {{workman}}
+            </td>
+            <td class="text-right">
+                {{workman.count}}
+            </td>
+            <td>{{workman.workman.measure}}</td>
+            <td></td>
+            <td></td>
+            <td>{{ ntz|lookup:operation.name }}</td>
+            <td>
+                {{ total_ntz|lookup:operation.name }}
+            </td>
+        </tr>
+        {% endfor %}
+        {% endif %}
+
+
+        {% if operation.machine_operation.all %}
+        <tr>
+            <td></td>
+            <td></td>
+            <td>
+                <strong>Машины и механизмы:</strong>
+            </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        {% for machine in operation.machine_operation.all %}
+        <tr>
+            <td></td>
+            <td style="white-space: nowrap;">{{machine.machine.title}}</td>
+            <td>
+                {{machine}}
+            </td>
+            <td></td>
+            <td>{{machine.machine.measurement}}</td>
+            <td></td>
+            <td></td>
+            <td>{{ ntz|lookup:operation.name }}</td>
+            <td>
+                {{ total_ntz|lookup:operation.name }}
+            </td>
+        </tr>
+        {% endfor %}
+        {% endif %}
+
+
+        {% if operation.material_operation.all %}
+        <tr>
+            <td></td>
+            <td></td>
+            <td>
+                <strong>Материалы:</strong>
+            </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        {% for material in operation.material_operation.all %}
+        <tr>
+            <td></td>
+            <td style="white-space: nowrap;">{{material.material.title}}</td>
+            <td>
+                {{material}}
+            </td>
+            <td></td>
+            <td>
+                {{material.material.measurement}}
+            </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>{{material.count}}</td>
+        </tr>
+        {% endfor %}
+        {% endif %}
+        {%endfor%}
+
+
+    </tbody>
+</table>
+{% endif %}
+{% endblock %}
+
+{% block extrascripts %}
+<script>
+    function deleteMachineForm() {
+        $(".delete-tk").each(function () {
+            $(this).modalForm({ formURL: $(this).data("form-url"), isDeleteForm: true });
+        });
+    }
+    deleteMachineForm();
+</script>
+
+{% endblock %}

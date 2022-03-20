@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+{% load my_filter %}
+{% block content %}
+
+{%if not object.form_8.all %}
+{%else%}
+<div class="text-center">
+    <div class="btn-group" role="group">
+        <div class="dropdown">
+            <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Форма-7
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                {% for form in object.form_8.all %}
+                <a class="dropdown-item" href="{{ form.get_absolute_url }}"> Форма-7({{forloop.counter}})</a>
+                {% endfor %}
+            </div>
+          </div>
+        <a class="btn btn-sm btn-primary" href="{{ object.get_form_8_url }}">Форма-8</a>
+        <a class="btn btn-sm btn-outline-primary" href="{{ object.get_form_1_url }}">Форма-1</a>
+        <a class="btn btn-sm btn-outline-primary" href="{{ object.get_form_2_url }}">Форма-2</a>
+        <a class="btn btn-sm btn-outline-primary" href="{{ object.get_form_3_url }}">Форма-3</a>
+        <a class="btn btn-sm btn-outline-primary" href="{{ object.get_form_4_url }}">Форма-4</a>
+        <a class="btn btn-sm btn-outline-primary" href="{{ object.get_form_5_url }}">Форма-5</a>
+        <a class="btn btn-sm btn-outline-primary" href="{{ object.get_form_6_url }}">Форма-6</a>
+        </div>
+</div>
+{%endif%}
+<hr>
+
+{%if object.form_8.all %}
+
+<h4 class="text-center">
+    "Таблица вывода норм (ТВН)"
+</h4>
+<p class="text-center mt-4">
+    {{object.title}} <br> к {{object.code}}
+</p>
+<br>
+
+<table class="table table-secondary table-sm table-bordered">
+    <thead>
+        <tr>
+            <th class="text-center" colspan="2" scope="col">Организация-разработчик</th>
+            <th class="text-center" colspan="5" scope="col">Объект</th>
+            <th class="text-center" colspan="5" scope="col">Дата наблюдений
+                {{object.created_at|date:"d.m.Y"}}</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td class="text-center" colspan="2" scope="col">Наименование <br> технологического процесса</td>
+            <td class="text-center" colspan="5" scope="col">{{object.title}}</td>
+            <td class="text-center" colspan="5" rowspan="2" scope="col">Объем выполненных работ: <br> {{object.process_meter}} {{object.process_measure}}</td>
+        </tr>
+        <tr>
+            <td colspan="7" scope="col">Дополнительные сведения (при необходимости)</td>
+        </tr>
+    </tbody>
+    <thead>
+        <tr>
+            <th class="text-center" rowspan="2" scope="col">#</th>
+            <th class="text-center" rowspan="2" scope="col">Наименование рабочей операции <br> (элемента) процесса</th>
+            <th class="text-center" rowspan="2" scope="col">Измеритель</th>
+            <th class="text-center" rowspan="2" scope="col">Парамерты</th>
+            <th class="text-center"  colspan="5" scope="col">Наблюдения</th>
+            <th class="text-center" rowspan="2" scope="col">Итого</th>
+            <th class="text-center" rowspan="2" scope="col">Сред. норма <br> затрат на измеритель</th>
+        </tr>
+        <tr>
+            <th>1</th>
+            <th>2</th>
+            <th>3</th>
+            <th>4</th>
+            <th>5</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for operation in operations %}
+        <tr>
+            <td rowspan="5" class="text-center">{{forloop.counter}}</td>
+            <td rowspan="5" class="text-center">{{operation.name}}</td>
+            <td rowspan="5" class="text-center">{{operation.measure}}</td>
+            <td>Затраты труда в чел.мин</td>
+            {% for obj in queryset %}
+            {% for oper in obj.has_operations|filter:operation.name %}
+            <td>
+                {% if oper.duration != 0 %}
+                {{oper.duration}}
+                {%else%}
+                <span>-</span>
+                {% endif %}
+
+            </td>
+            {% endfor %}
+            {% endfor %}
+            <td>
+                {{ durations|lookup:operation.name }}
+            </td>
+            <td rowspan="3"></td>
+        </tr>
+        <tr>
+            <td>Объем выполненных работ на измеритель</td>
+            {% for obj in queryset %}
+            {% for oper in obj.has_operations|filter:operation.name %}
+            <td>
+                {% if oper.products != 0 %}
+                {{oper.products}}
+                {%else%}
+                <span>-</span>
+                {% endif %}
+            </td>
+            {% endfor %}
+            {% endfor %}
+            <td>
+                {{ products|lookup:operation.name }}
+            </td>
+        </tr>
+        <tr>
+            <td>Кол-во работ, приходящихся на 60 чел.-мин.</td>
+            {% for count in count_of_work|lookup:operation.name %}
+            <td>
+                {{count}}
+            </td>
+            {% endfor %}
+            <td>
+                {{ sum_count_of_work|lookup:operation.name }}
+            </td>
+        </tr>
+        <tr>
+            <td>Затраты на измеритель элемента, чел.-мин.</td>
+            {% for count in count_of_product|lookup:operation.name %}
+            <td>
+                {{count}}
+            </td>
+            {% endfor %}
+            <td>
+                {{ sum_count_of_product|lookup:operation.name }}
+            </td>
+            <td>
+                {{ average_count_of_product|lookup:operation.name }}
+            </td>
+        </tr>
+        <tr>
+            <td colspan="1"></td>
+            <td colspan="5" class="text-right">Нтз (1 чел.) =</td>
+            <td colspan="2">
+                {{ ntz|lookup:operation.name }}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<a class="btn btn-sm btn-outline-danger" href="{{ object.get_absolute_url }}">На главную страницу ТК</a>
+<a class="get-excel" href="{% url 'form_8_excel' form_8.pk%}"><button type="button" class="btn btn-sm btn-primary">Скачать excel</button></a>
+{%endif%}
+{% endblock %}

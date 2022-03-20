@@ -1,0 +1,40 @@
+{% load static %}
+
+{% csrf_token %}
+<div class="modal-header">
+  <h3 class="modal-title">Обновление Базы справочников</h3>
+  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div class="modal-body">
+  <input name="file-excel" type="file" id="file" class="form-control mb-3">
+</div>
+<div class="modal-footer">
+  <button id="excel-upload-btn" class="btn btn-primary float-end" type="submit">Загрузить</button>
+</div>
+
+<script>
+  $("#excel-upload-btn").click(function () {
+    var f_obj = $("#file").get(0).files[0];
+    var data = new FormData();                                      
+    data.append("file", f_obj);
+    if ($('#file').val()) {
+      $.ajax({
+      headers: { "X-CSRFToken": '{{csrf_token}}' },
+      type: 'POST',
+      url: '/excel/upload/',
+      data: data,
+      contentType: false,
+      processData: false,
+      cache: false,
+    }).done(function (data){
+      window.location.href = '/form_8/';
+    });
+    confirm('База данных обновляется.\nЭто займет несколько минут');
+    } else {
+      alert('Файл не выбран');
+    }
+
+  });
+</script>

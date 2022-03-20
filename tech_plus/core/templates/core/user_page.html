@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% load crispy_forms_tags %}
+{% load my_filter %}
+
+{% block content %}
+<h2>
+    Ваш аккаунт - {{user.get_full_name}}
+</h2>
+<hr>
+<br>
+<form method="post" novalidate>
+    {% csrf_token %}
+    <div class="row">
+    <div class="col-3"></div>
+      <div class="col-6">
+          <h5 class="text-center">Смена пароля</h5>
+        {{ form.old_password|as_crispy_field }}
+      </div>
+      <div class="col-3"></div>
+    </div>
+    <div class="row">
+        <div class="col-3"></div>
+        <div class="col-6">
+            {{ form.new_password1|as_crispy_field }}
+        </div>
+        <div class="col-3"></div>
+    </div>
+    <div class="row">
+        <div class="col-3"></div>
+        <div class="col-6">
+            {{ form.new_password2|as_crispy_field }}
+            <button type="submit" class="btn btn-primary">Обновить</button>
+        </div>
+        <div class="col-3"></div>
+    </div>
+  </form>
+
+
+  
+
+
+{% endblock %}

@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% load my_filter %}
+
+{% block content %}
+<div class="text-center">
+    <div class="btn-group" role="group">
+        <div class="dropdown">
+            <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Форма-7
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                {% for form in object.form_8.all %}
+                <a class="dropdown-item" href="{{ form.get_absolute_url }}"> Форма-7({{forloop.counter}})</a>
+                {% endfor %}
+            </div>
+          </div>
+        <a class="btn btn-sm btn-outline-primary" href="{{ object.get_form_8_url }}">Форма-8</a>
+        <a class="btn btn-sm btn-outline-primary" href="{{ object.get_form_1_url }}">Форма-1</a>
+        <a class="btn btn-sm btn-outline-primary" href="{{ object.get_form_2_url }}">Форма-2</a>
+        <a class="btn btn-sm btn-outline-primary" href="{{ object.get_form_3_url }}">Форма-3</a>
+        <a class="btn btn-sm btn-outline-primary" href="{{ object.get_form_4_url }}">Форма-4</a>
+        <a class="btn btn-sm btn-primary" href="{{ object.get_form_5_url }}">Форма-5</a>
+        <a class="btn btn-sm btn-outline-primary" href="{{ object.get_form_6_url }}">Форма-6</a>
+    </div>
+</div>
+<hr>
+<h4 class="text-center mt-3">
+    "Сводка
+    расхода материальных ресурсов"
+</h4>
+<p class="text-center mt-4">
+    {{object.title}} <br> к {{object.code}}
+</p>
+<br>
+<h5>
+    Измеритель ЭСН/ЭСНм/ЭСНп: {{object.main_measure}}
+</h5>
+<table class="table table-secondary table-sm table-bordered">
+    <thead>
+        <tr> 
+            <th class="text-center" rowspan="2" scope="col">№</th>
+            <th class="text-center" rowspan="2" scope="col">Наименование материальных <br>
+                ресурсов и их технические <br>
+                характеристики</th>
+            <th class="text-center" rowspan="2" scope="col">Ед. изм.</th>
+            <th class="text-center" colspan="2" scope="col">Расход материальных ресурсов</th>
+        </tr>
+        <tr>
+            <th class="text-center" scope="col">На измеритель процесса</th>
+            <th class="text-center" scope="col">На измеритель <br> ЭСН/ЭСНм/ЭСНп</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for key, value in materials.items %}
+        <tr>
+            <td>{{forloop.counter}}</td>
+            <td>{{code|lookup:key}} {{key}}</td>
+            <td>{{measure|lookup:key}}</td>
+            <td>{{value}}</td>
+            <td>{{material_measure|lookup:key}}</td>
+        </tr>
+        {% endfor %}
+        
+    </tbody>
+</table>
+<a class="btn btn-sm btn-outline-danger" href="{{ object.get_absolute_url }}">На главную страницу ТК</a>
+<a class="get-excel" href="{% url 'form_5_excel' form_8.pk%}"><button type="button" class="btn btn-sm btn-primary">Скачать excel</button></a>
+{% endblock %}

@@ -1,0 +1,183 @@
+{% extends 'base.html' %}
+
+{% load my_filter %}
+
+{% block content %}
+<div class="text-center">
+    <div class="btn-group" role="group">
+        <div class="dropdown">
+            <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Форма-7
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                {% for form in object.form_8.all %}
+                <a class="dropdown-item" href="{{ form.get_absolute_url }}"> Форма-7({{forloop.counter}})</a>
+                {% endfor %}
+            </div>
+          </div>
+        <a class="btn btn-sm btn-outline-primary" href="{{ object.get_form_8_url }}">Форма-8</a>
+        <a class="btn btn-sm btn-outline-primary" href="{{ object.get_form_1_url }}">Форма-1</a>
+        <a class="btn btn-sm btn-primary" href="{{ object.get_form_2_url }}">Форма-2</a>
+        <a class="btn btn-sm btn-outline-primary" href="{{ object.get_form_3_url }}">Форма-3</a>
+        <a class="btn btn-sm btn-outline-primary" href="{{ object.get_form_4_url }}">Форма-4</a>
+        <a class="btn btn-sm btn-outline-primary" href="{{ object.get_form_5_url }}">Форма-5</a>
+        <a class="btn btn-sm btn-outline-primary" href="{{ object.get_form_6_url }}">Форма-6</a>
+    </div>
+</div>
+<hr>
+<h4 class="text-center mt-3">
+    "Калькуляция затрат строительных ресурсов"
+</h4>
+<p class="text-center mt-4">
+    {{object.title}} <br> к {{object.code}}
+</p>
+<br>
+<h5>Измеритель: {{object.process_meter}} {{object.process_measure}}</h5>
+<table class="table table-secondary table-sm table-bordered">
+    <thead>
+        <tr> 
+            <th class="text-center" rowspan="2" scope="col">№</th>
+            <th class="text-center" rowspan="2" scope="col">Обоснование</th>
+            <th class="text-center" rowspan="2" scope="col">Наименоване <br> работ и затрат</th>
+            <th class="text-center" rowspan="2" scope="col">Кол-во рабочих-строителей <br> чел.</th>
+            <th class="text-center" rowspan="2" scope="col">Ед. изм.</th>
+            <th class="text-center" rowspan="2" scope="col">Объем <br> рабочих  <br> операций </th>
+            <th class="text-center" colspan="2" scope="col">Потребность в ресурсах</th>
+        </tr>
+        <tr>
+            <th class="text-center" scope="col">На ед. изм.</th>
+            <th class="text-center" scope="col">Общая</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for operation in operations %}
+            <tr>
+                <td>
+                    {{forloop.counter}}
+                </td>
+                <td style="white-space: nowrap;">
+                    {% if operation.code %}
+                        {{operation.code}}
+                    {%else%}
+                        ТВН №{{forloop.counter}}
+                    {% endif %}
+                </td>
+                <td>
+                    {{operation}}
+                </td>
+                <td></td>
+                <td>{{operation.measure}}</td> 
+                <td>
+                    {{ sum_products|lookup:operation.name }}
+                </td>
+                <td></td>
+                <td></td>
+            </tr>
+
+
+            {% if operation.member_operation.all %}
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td>
+                        <strong>Состав звена:</strong>
+                    </td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                {% for workman in operation.member_operation.all %}
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td>
+                        {{workman}}
+                    </td>
+                    <td class="text-right">
+                        {{workman.count}}
+                    </td>
+                    <td>{{workman.workman.measure}}</td>
+                    <td></td>
+                    <td>{{ ntz|lookup:operation.name }}</td>
+                    <td>
+                        {{ total_ntz|lookup:operation.name }}
+                    </td>
+                </tr>
+                {% endfor %}
+            {% endif %}
+
+
+            {% if operation.machine_operation.all %}
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td>
+                        <strong>Машины и механизмы:</strong>
+                    </td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                {% for machine in operation.machine_operation.all %}
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td>
+                        {{machine}}
+                    </td>
+                    <td>
+                       
+                    </td>
+                    <td>{{machine.machine.measurement}}</td>
+                    <td></td>
+                    <td>{{ ntz|lookup:operation.name }}</td>
+                    <td>
+                        {{ total_ntz|lookup:operation.name }}
+                    </td>
+                </tr>
+                {% endfor %}
+            {% endif %}
+
+
+            {% if operation.material_operation.all %}
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td>
+                        <strong>Материалы:</strong>
+                    </td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                {% for material in operation.material_operation.all %}
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td>
+                        {{material}}
+                    </td>
+                    <td></td>
+                    <td>
+                        {{material.material.measurement}}
+                    </td>
+                    <td></td>
+                    <td></td>
+                    <td>{{material.count}}</td>
+                </tr>
+                {% endfor %}
+                {% endif %}
+        {%endfor%}
+
+
+    </tbody>
+</table>
+<a class="btn btn-sm btn-outline-danger" href="{{ object.get_absolute_url }}">На главную страницу ТК</a>
+<a class="get-excel" href="{% url 'form_2_excel' form_8.pk%}"><button type="button" class="btn btn-sm btn-primary">Скачать excel</button></a>
+{% endblock %}

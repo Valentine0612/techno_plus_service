@@ -1,0 +1,358 @@
+{% extends 'base.html' %}
+{% load my_filter %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+
+
+<h4 class="text-center">Форма_7 (Редактируемая) - {{ object }}</h4>
+<hr>
+<div class="row">
+    <div class="col-md-4">
+        <h6>
+            Начало - {{object.start|date:"H:i"}}
+        </h6>
+    </div>
+    <div class="col-md-4">
+        <h6>
+            Конец -
+            {% if object.end == None %}
+
+            {%else%}
+            {{object.end|date:"H:i"}}
+            {% endif %}
+        </h6>
+    </div>
+    <div class="col-md-4">
+        <h6>
+            Продолжительность - {{object.get_time_diff}}
+        </h6>
+    </div>
+</div>
+<hr>
+<div>
+    <button type="button" class="update-form btn btn-sm btn-outline-primary"
+        data-form-url="{{ object.get_update_url }}">
+        Изменить время измерений
+    </button>
+</div>
+
+<button id="create-operation" class="btn btn-sm mt-5 btn-info" type="button" name="button">
+    Создать новую операцию</button>
+<button id="add-operation" type="button" class="btn mt-5 btn-sm btn-outline-info">
+    Справочник операций</button>
+<button id="add-operation-from-book" type="button" class="btn mt-5 btn-sm btn-outline-info">
+    Справочник норм</button>
+
+
+{% if object.has_operations %}
+<h4 class="mt-2">Наименование элементов</h4>
+<hr>
+<div class="row mt-2">
+    <div class="col-md-2 ">
+        Название
+    </div>
+    <div class="col-md-6 text-center">
+        Продолжительность (минут)
+    </div>
+    <div class="col-md-1 text-center ">
+        Всего
+    </div>
+    <div class="col-md-3 text-center ">
+        Действия
+    </div>
+</div>
+<hr>
+{% for title in object.has_operations.all %}
+<div class="row">
+    <div class="col-md-2 ">
+        {{title.name}}
+    </div>
+    <div class="col-md-6 ">
+        <div class="row">
+            {% for i in title.start|times %}
+            <div id="white_square"></div>
+            {% endfor %}
+            {% for i in title.duration|times %}
+            <div id="square"></div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="col-md-1 text-center ">
+        {{title.duration}}
+    </div>
+    <div class="col-md-3 text-center flex-column ">
+        <form action="{{ title.get_copy_url }}" method="POST">
+            {%csrf_token%}
+            <button type="submit" class="create-material btn btn-sm btn-outline-info" title="Скопировать">
+                <span class="fa fa-copy"></span>
+            </button>
+            <button type="button" class="create-material btn btn-sm btn-primary"
+                data-form-url="{{ title.get_material_url }}" title="Материалы">
+                <span class="fa fa-recycle"></span>
+            </button>
+            <button type="button" class="create-machine btn btn-sm btn-primary"
+                data-form-url="{{ title.get_machine_url }}" title="Машины и механизмы">
+                <span class="fa fa-gears"></span>
+            </button>
+            <button type="button" class="create-workman btn btn-sm btn-primary"
+                data-form-url="{{ title.get_workman_url }}" title="Состав звена">
+                <span class="fa fa-user-plus"></span>
+            </button>
+            <button type="button" class="update-operation btn btn-sm btn-primary"
+                data-form-url="{{ title.get_update_url }}" title="Редактирование">
+                <span class="fa fa-pencil"></span>
+            </button>
+            <button type="button" class="delete-operation btn btn-sm btn-danger"
+                data-form-url="{{ title.get_delete_url }}" title="Удаление">
+                <span class="fa fa-trash"></span>
+            </button>
+        </form>
+    </div>
+</div>
+
+<table class="table table-sm table-bordered mt-3" style="background-color: #eee;">
+    <tbody>
+        {% if title.workman.all %}
+        <thead>
+            <tr>
+                <th class="text-center" scope="col"></th>
+                <th class="text-center" scope="col">Квалификация</th>
+                <th class="text-center" scope="col">Тарифный коэффициент</th>
+                <th class="text-center" scope="col">Количество</th>
+                <th class="text-center" scope="col"></th>
+
+            </tr>
+        </thead>
+        <tr>
+            <th rowspan="{{title.workman.count}}">Рабочие</th>
+
+            {% for workman in title.member_operation.all %}
+            <td>{{workman}}</td>
+            <td>{{workman.workman.ratio}}</td>
+            <td>{{workman.count}}</td>
+            <td class="text-center">
+                <button type="button" class="edit-workman btn btn-sm btn-outline-info"
+                    data-form-url="{{ workman.get_update_url }}">
+                    <span class="fa fa-pencil"></span>
+                </button>
+                <button type="button" class="delete-workman btn btn-sm btn-outline-danger"
+                    data-form-url="{{ workman.get_delete_url }}">
+                    <span class="fa fa-trash"></span>
+                </button>
+            </td>
+        </tr>
+        {% endfor %}
+        {% endif %}
+
+        {% if title.material.all %}
+        <thead>
+            <tr>
+                <th class="text-center" scope="col"></th>
+                <th class="text-center" scope="col">Код</th>
+                <th class="text-center" scope="col">Наименование</th>
+                <th class="text-center" scope="col">Количество</th>
+                <th class="text-center" scope="col"></th>
+
+            </tr>
+        </thead>
+        <tr>
+            <th rowspan="{{title.material.count}}">Материалы</th>
+
+            {% for material in title.material_operation.all %}
+            <td>{{material.material.title}}</td>
+            <td title="{{material}}">{{material}}</td>
+            <td>{{material.count}}</td>
+            <td class="text-center">
+                <button type="button" class="edit-material btn btn-sm btn-outline-info"
+                    data-form-url="{{ material.get_update_url }}">
+                    <span class="fa fa-pencil"></span>
+                </button>
+                <button type="button" class="delete-material btn btn-sm btn-outline-danger"
+                    data-form-url="{{ material.get_delete_url }}">
+                    <span class="fa fa-trash"></span>
+                </button>
+            </td>
+        </tr>
+        {% endfor %}
+        {% endif %}
+
+        {% if title.machine.all %}
+        <thead>
+            <tr>
+                <th class="text-center" scope="col"></th>
+                <th class="text-center" scope="col">Код</th>
+                <th class="text-center" scope="col">Наименование</th>
+                <th class="text-center" scope="col">Машинист</th>
+                <th class="text-center" scope="col"></th>
+
+            </tr>
+        </thead>
+        <tr>
+            <th rowspan="{{title.machine.count}}">Машины и <br> механизмы</th>
+
+            {% for machine in title.machine_operation.all %}
+            <td>{{machine.machine.title}}</td>
+            <td alt="{{machine}}">{{machine}}</td>
+            <td>
+                {% if machine.is_driver %}
+                Да
+                {%else%}
+                Нет
+                {% endif %}
+            </td>
+            <td class="text-center">
+                <button type="button" class="delete-machine btn btn-sm btn-outline-danger"
+                    data-form-url="{{ machine.get_delete_url }}">
+                    <span class="fa fa-trash"></span>
+                </button>
+            </td>
+        </tr>
+        {% endfor %}
+        {% endif %}
+
+
+    </tbody>
+</table>
+
+<hr>
+{% endfor %}
+{% endif %}
+<a class="btn btn-sm btn-outline-danger" href="{{object.get_absolute_url}}">Назад к Форме-7</a>
+
+{% endblock %}
+
+{% block extrascripts %}
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        $("#create-operation").modalForm({
+            formURL: "{% url 'operation_create_url' %}",
+            modalID: "#create-modal"
+        });
+
+    });
+
+    $(document).ready(function () {
+
+        $("#add-operation").modalForm({
+            formURL: "{% url 'add_operation_url' %}",
+            modalID: "#create-modal"
+        });
+
+    });
+
+    $(document).ready(function () {
+
+        $("#add-operation-from-book").modalForm({
+            formURL: "{% url 'add_operation_from_book_url' %}",
+            modalID: "#create-modal"
+        });
+
+    });
+
+    // modal form
+    function updateBookModalForm() {
+        $(".update-operation").each(function () {
+            $(this).modalForm({
+                formURL: $(this).data("form-url"),
+                modalID: "#create-modal"
+            });
+        });
+    }
+    updateBookModalForm();
+
+    function createWorkmanForm() {
+        $(".create-workman").each(function () {
+            $(this).modalForm({
+                formURL: $(this).data("form-url"),
+                modalID: "#create-modal"
+            });
+        });
+    }
+    createWorkmanForm();
+
+    function editWorkmanForm() {
+        $(".edit-workman").each(function () {
+            $(this).modalForm({
+                formURL: $(this).data("form-url"),
+                modalID: "#create-modal"
+            });
+        });
+    }
+    editWorkmanForm();
+
+    function editMaterialForm() {
+        $(".edit-material").each(function () {
+            $(this).modalForm({
+                formURL: $(this).data("form-url"),
+                modalID: "#create-modal"
+            });
+        });
+    }
+    editMaterialForm();
+
+    function createMaterialForm() {
+        $(".create-material").each(function () {
+            $(this).modalForm({
+                formURL: $(this).data("form-url"),
+                modalID: "#create-modal"
+            });
+        });
+    }
+    createMaterialForm();
+
+    function createMachineForm() {
+        $(".create-machine").each(function () {
+            $(this).modalForm({
+                formURL: $(this).data("form-url"),
+                modalID: "#create-modal"
+            });
+        });
+    }
+    createMachineForm();
+
+    function updateFromModalForm() {
+        $(".update-form").each(function () {
+            $(this).modalForm({
+                formURL: $(this).data("form-url"),
+                modalID: "#create-modal"
+            });
+        });
+    }
+    updateFromModalForm();
+
+    function deleteBookModalForm() {
+        $(".delete-operation").each(function () {
+            $(this).modalForm({ formURL: $(this).data("form-url"), isDeleteForm: true });
+        });
+    }
+    deleteBookModalForm();
+
+    function deleteWorkmanForm() {
+        $(".delete-workman").each(function () {
+            $(this).modalForm({ formURL: $(this).data("form-url"), isDeleteForm: true });
+        });
+    }
+    deleteWorkmanForm();
+
+    function deleteMaterialForm() {
+        $(".delete-material").each(function () {
+            $(this).modalForm({ formURL: $(this).data("form-url"), isDeleteForm: true });
+        });
+    }
+    deleteMaterialForm();
+
+    function deleteMachineForm() {
+        $(".delete-machine").each(function () {
+            $(this).modalForm({ formURL: $(this).data("form-url"), isDeleteForm: true });
+        });
+    }
+    deleteMachineForm();
+
+    $(".alert").fadeTo(2000, 500).slideUp(500, function () {
+        $(".alert").slideUp(500);
+    });
+</script>
+
+{% endblock extrascripts %}

@@ -1,0 +1,48 @@
+<div id="success_message" class="ajax_response" ></div>
+<div>
+    {% if messages %}
+    {% for message in messages %}
+    <div style="border-radius:0;" {% if message.tags %}
+        class="alert alert-icon alert-{{ message.tags }} alert-dismissible fade show mb-0" role="alert" {% endif %}>
+        {{ message }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    {% endfor %}
+    {% endif %}
+</div>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    {% if user.is_authenticated %}
+    <a class="navbar-brand" href="{% url 'form_8_list_url'%}">ТЕХНО <span class="fa fa-plus " style="color: #e0a921"></span></a>
+    {%else%}
+    <a class="navbar-brand" href="{% url 'home_url' %}">ТЕХНО <span class="fa fa-plus " style="color: #e0a921"></span></a>
+    {% endif %}
+    <ul class="navbar-nav mr-auto">
+        {% if user.is_authenticated %}
+
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'form_8_list_url'%}">ТК</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{user.get_absolute_url}}" >{{user.get_full_name}}</a>
+        </li>
+        {% endif %}
+    </ul>
+
+    {% if user.is_verifier %}
+    <form class="form-inline my-2 my-lg-0">
+        <div class="navbar-nav">
+            <button class="excel-upload-modal btn btn-sm btn-outline-light" data-form-url="{% url 'excel_upload_url' %}"
+                type="button" name="button" data-toggle="modal">Обновить Базу Справочников</button>
+        </div>
+    </form>
+    {% endif %}
+    {% if user.is_staff %}
+    <a class="btn btn-sm btn-outline-warning ml-3" href="/admin/">Управление базой</a>
+    {% endif %}
+    {% if  user.is_authenticated %}
+    <a class="btn btn-sm btn-primary ml-3" href="/logout/">Выход</a>
+    {% endif %}
+</nav>

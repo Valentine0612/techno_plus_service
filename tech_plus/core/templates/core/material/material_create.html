@@ -1,0 +1,97 @@
+{% load widget_tweaks %}
+
+<form method="post" action="" id="machineForm">
+  {% csrf_token %}
+
+  <div class="modal-header">
+    <h3 class="modal-title">Добавить материалы</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+
+  <div class="modal-body">
+
+    <div class="{% if form.non_field_errors %}invalid{% endif %} mb-2">
+      {% for error in form.non_field_errors %}
+      {{ error }}
+      {% endfor %}
+    </div>
+
+    {% for field in form %}
+    <div class="form-group">
+      <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+      {% render_field field class="form-control" %}
+      <div class="{% if field.errors %} invalid{% endif %}">
+        {% for error in field.errors %}
+        <p class="help-block">{{ error }}</p>
+        {% endfor %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="modal-footer">
+    <button type="submit" class="btn btn-primary">Создать</button>
+  </div>
+
+</form>
+
+<script>
+  $("#id_group").change(function () {
+      const groupId = $(this).val();
+
+      $.ajax({                       
+          url: '/ajax/load-group/',                   
+          data: {
+              'group_id': groupId      
+          },
+          success: function (data) {  
+              $("#id_material").html(data);  
+          }
+      });
+  });
+
+  $("#id_chapter").change(function () {
+      const chapterId = $(this).val();
+
+      $.ajax({                       
+          url: '/ajax/load-chapter/',                   
+          data: {
+              'chapter_id': chapterId   
+          },
+          success: function (data) {  
+              $("#id_group").html(data);  
+          }
+      });
+  });
+
+  $("#id_partbook").change(function () {
+      const partBookId = $(this).val();
+
+      $.ajax({                       
+          url: '/ajax/load-part_book/',                   
+          data: {
+              'part_book_id': partBookId   
+          },
+          success: function (data) {  
+              $("#id_chapter").html(data);  
+          }
+      });
+  });
+
+  $("#id_book").change(function () {
+      const BookId = $(this).val();
+
+      $.ajax({                       
+          url: '/ajax/load-book/',                   
+          data: {
+              'book_id': BookId   
+          },
+          success: function (data) {  
+              $("#id_partbook").html(data);  
+          }
+      });
+  });
+
+</script>

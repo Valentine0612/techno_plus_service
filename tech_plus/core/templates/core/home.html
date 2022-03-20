@@ -1,0 +1,68 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/main.css' %}">
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+    <link rel="stylesheet" href="{% static 'fonts/css/font-awesome.min.css' %}">
+    <title>{% block title %} Техно-плюс {% endblock %}</title>
+
+</head>
+
+<body>
+    <div class="wraper">
+        {%include 'core/_modal.html'%}
+        <div class="bg content" id="main">
+            <div class="row">
+                <div class="col text-center" id="child">
+                    {% if not user.is_authenticated %}                    
+                        <a class="btn btn-lg btn-warning mb-5" href="{%url 'login'%}">Войти в систему </a>
+                    {%else%}
+                        <a class="btn btn-lg btn-warning mb-5" href="{%url 'form_8_create_url'%}">Создать ТК </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{% static 'js/jquery-3.2.1.min.js' %}"></script>
+    <script src="{% static 'js/jquery.bootstrap.modal.forms.js' %}"></script>
+    <script src="{% static 'js/popper.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.js' %}"></script>
+    <script>
+        $(document).ready(function () {
+            $.ajax({
+                url: "{% url  'excel_check' %}",
+                cache: false,
+                success: function (responce) {
+                    if (responce.result) {
+                        alert('База данных обновлена!');
+                    };
+                }
+            })
+        })
+    </script>
+
+
+    {% block extrascripts %}{% endblock extrascripts %}
+    <script>
+        function ExeleModalForm() {
+            $(".excel-upload-modal").each(function () {
+                $(this).modalForm({
+                    formURL: $(this).data("form-url"),
+                    modalID: "#create-modal"
+                });
+            });
+        }
+        ExeleModalForm();
+    </script>
+</body>
+
+</html>
