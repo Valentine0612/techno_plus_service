@@ -15,11 +15,11 @@ Analytical tool for calculation of technological maps and export to Excel format
 
 ### Getting Started 
 
-1. virtualenv venv
-2. git clone 
-3. source venv/bin/activate
-4. pip install -r requirements.txt
-5. ./manage.py runserver
+1. `virtualenv venv`
+2. `git clone https://github.com/Valentine0612/techno_plus_service.git`
+3. `source venv/bin/activate`
+4. `pip install -r requirements.txt`
+5. `./manage.py runserver`
 
 
 
